@@ -8,8 +8,22 @@ public class LuShooter : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore" });
+		PublicDependencyModuleNames.AddRange(new string[]
+		{
+			"Core",
+			"CoreUObject",
+			"Engine",
+			"GameplayTags",
+			"GameplayTasks",
+			"GameplayAbilities"
+		});
 
-		PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore", "UMG" });
+		PrivateDependencyModuleNames.AddRange(new string[]
+		{
+			"InputCore",
+			"Slate",
+			"SlateCore",
+			"UMG",
+		});
 	}
 }
