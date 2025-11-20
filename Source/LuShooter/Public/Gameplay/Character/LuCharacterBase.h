@@ -7,8 +7,8 @@
 #include "GameFramework/Character.h"
 #include "LuCharacterBase.generated.h"
 
-enum class EGameplayEffectReplicationMode : uint8;
 class ULuAbilitySystemComponent;
+class UHealthAttributeSet;
 
 UCLASS(Abstract)
 class LUSHOOTER_API ALuCharacterBase : public ACharacter, public IAbilitySystemInterface
@@ -18,11 +18,16 @@ class LUSHOOTER_API ALuCharacterBase : public ACharacter, public IAbilitySystemI
 public:
 	explicit ALuCharacterBase(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
+	FORCEINLINE UHealthAttributeSet* GetHealthAttributeSet() const { return HealthAttributeSet; }
+
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
 	virtual void PostInitializeComponents() override;
 
 protected:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true), Category="LU|Ability")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true), Category="Ability")
 	TObjectPtr<ULuAbilitySystemComponent> AbilitySystemComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true), Category="Attributes")
+	TObjectPtr<UHealthAttributeSet> HealthAttributeSet;
 };
