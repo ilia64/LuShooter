@@ -3,6 +3,8 @@
 #include "LuShooter/Public/Gameplay/Character/LuCharacterBase.h"
 #include "Gameplay/AbilitySystem/LuAbilitySystemComponent.h"
 #include "Gameplay/AbilitySystem/Attributes/HealthAttributeSet.h"
+#include "Gameplay/Character/Data/CharacterData.h"
+#include "Gameplay/Character/Data/CharacterDataAsset.h"
 
 DEFINE_LOG_CATEGORY(LogCharacter);
 
@@ -33,17 +35,79 @@ void ALuCharacterBase::BeginPlay()
 
 	if (HasAuthority())
 	{
-		InitializeDefaultAbilities();
-		InitializeDefaultEffects();
+		if (InitDataAsset.IsValid())
+		{
+			//TODO use StreamableManager under LoadSynchronous
+			if (const UCharacterDataAsset* DataAsset = InitDataAsset.LoadSynchronous())
+			{
+				InitializeDefaultsFromData(DataAsset->Data);
+			}
+		}
+
+		InitializeStartupAbilities();
+		InitializeStartupEffects();
 	}
 }
 
-void ALuCharacterBase::InitializeDefaultAbilities()
+void ALuCharacterBase::InitializeDefaultsFromData(const FCharacterData& Data)
+{
+	if (AttributeInitializerEffect.Get())
+	{
+		const FGameplayEffectContextHandle EffectContext = GetGameplayEffectContextSelf();
+		const FGameplayEffectSpecHandle SpecHandle = AbilitySystemComponent->MakeOutgoingSpec(AttributeInitializerEffect, 1, EffectContext);
+		if (FGameplayEffectSpec* Spec = SpecHandle.Data.Get())
+		{
+			for (const auto& Pair : Data.AttributesByTag)
+			{
+				if (Pair.Key.IsValid())
+				{
+					Spec->SetSetByCallerMagnitude(Pair.Key, Pair.Value);
+				}
+				else
+				{
+					UE_LOG(LogCharacter, Warning, TEXT("Invalid or empty GameplayTag in AttributesByTag for character %s (effect: %s)"), *GetNameSafe(this), *GetNameSafe(AttributeInitializerEffect.Get()));
+				}
+			}
+
+			const bool bResult = ApplyGameplayEffectToSelf(SpecHandle);
+			if (!bResult)
+			{
+				UE_LOG(LogCharacter, Error, TEXT("Failed to apply AttributeInitializerEffect: %s to %s"), *GetNameSafe(AttributeInitializerEffect.Get()), *GetNameSafe(this));
+			}
+		}
+		else
+		{
+			UE_LOG(LogCharacter, Warning, TEXT("Failed to create GameplayEffectSpec from AttributeInitializerEffect %s for character %s. Check if effect is valid and ASC is ready."), *GetNameSafe(AttributeInitializerEffect.Get()), *GetNameSafe(this));
+		}
+	}
+
+	if (!Data.StartupAbilities.IsEmpty())
+	{
+		if (Data.OverrideNotAddStartupAbilities)
+		{
+			StartupAbilities.Empty();
+		}
+
+		StartupAbilities.Append(Data.StartupAbilities);
+	}
+
+	if (!Data.StartupEffects.IsEmpty())
+	{
+		if (Data.OverrideNotAddStartupEffects)
+		{
+			StartupEffects.Empty();
+		}
+
+		StartupEffects.Append(Data.StartupEffects);
+	}
+}
+
+void ALuCharacterBase::InitializeStartupAbilities()
 {
 	check(AbilitySystemComponent);
 	check(HasAuthority());
 
-	for (TSubclassOf Ability : DefaultAbilities)
+	for (TSubclassOf Ability : StartupAbilities)
 	{
 		if (Ability.Get())
 		{
@@ -55,58 +119,62 @@ void ALuCharacterBase::InitializeDefaultAbilities()
 		}
 		else
 		{
-			UE_LOG(LogCharacter, Warning, TEXT("%s has null Ability in DefaultAbilities"), *GetNameSafe(this));
+			UE_LOG(LogCharacter, Warning, TEXT("%s has null Ability in StartupAbilities"), *GetNameSafe(this));
 		}
 	}
 }
 
-void ALuCharacterBase::InitializeDefaultEffects()
+void ALuCharacterBase::InitializeStartupEffects()
 {
 	check(HasAuthority());
 
-	FGameplayEffectContextHandle EffectContext = AbilitySystemComponent->MakeEffectContext();
-	EffectContext.AddSourceObject(this);
-
-	if (DefaultAttributes.Get())
-	{
-		const bool bResult = ApplyGameplayEffectToSelf(DefaultAttributes, EffectContext);
-		if (bResult == false)
-		{
-			UE_LOG(LogCharacter, Error, TEXT("Failed to apply DefaultAttributes: %s to %s"), *GetNameSafe(DefaultAttributes.Get()), *GetNameSafe(this));
-		}
-	}
-
-	for (TSubclassOf EffectClass : DefaultEffects)
+	const FGameplayEffectContextHandle EffectContext = GetGameplayEffectContextSelf();
+	for (TSubclassOf EffectClass : StartupEffects)
 	{
 		if (EffectClass.Get())
 		{
 			const bool bResult = ApplyGameplayEffectToSelf(EffectClass, EffectContext);
-			if (bResult == false)
+			if (!bResult)
 			{
-				UE_LOG(LogCharacter, Error, TEXT("Failed to apply %s to %s from DefaultEffects"), *GetNameSafe(EffectClass), *GetNameSafe(this));
+				UE_LOG(LogCharacter, Error, TEXT("Failed to apply %s to %s from StartupEffects"), *GetNameSafe(EffectClass), *GetNameSafe(this));
 			}
 		}
 		else
 		{
-			UE_LOG(LogCharacter, Warning, TEXT("%s has null gameplayEffect in DefaultEffects"), *GetNameSafe(this));
+			UE_LOG(LogCharacter, Warning, TEXT("%s has null gameplayEffect in StartupEffects"), *GetNameSafe(this));
 		}
 	}
 }
 
+FGameplayEffectContextHandle ALuCharacterBase::GetGameplayEffectContextSelf() const
+{
+	check(AbilitySystemComponent);
+
+	FGameplayEffectContextHandle EffectContext = AbilitySystemComponent->MakeEffectContext();
+	EffectContext.AddSourceObject(this);
+	return EffectContext;
+}
+
 bool ALuCharacterBase::ApplyGameplayEffectToSelf(const TSubclassOf<UGameplayEffect>& EffectClass, const FGameplayEffectContextHandle& EffectContext) const
 {
-	check(HasAuthority());
-	check(AbilitySystemComponent);
 	check(EffectClass.Get());
 	check(EffectContext.IsValid());
 
 	const FGameplayEffectSpecHandle SpecHandle = AbilitySystemComponent->MakeOutgoingSpec(EffectClass, 1, EffectContext);
+	return ApplyGameplayEffectToSelf(SpecHandle);
+}
+
+bool ALuCharacterBase::ApplyGameplayEffectToSelf(const FGameplayEffectSpecHandle& SpecHandle) const
+{
+	check(HasAuthority());
+	check(AbilitySystemComponent);
+
 	if (SpecHandle.IsValid())
 	{
 		const FActiveGameplayEffectHandle EffectHandle = AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
 		return EffectHandle.WasSuccessfullyApplied();
 	}
 
-	UE_LOG(LogCharacter, Error, TEXT("Failed to apply %s to %s. SpecHandle not valid!"), *GetNameSafe(EffectClass.Get()), *GetNameSafe(this));
+	UE_LOG(LogCharacter, Error, TEXT("Attempted to apply invalid GameplayEffectSpec to character %s. SpecHandle is not valid — check effect class and AbilitySystemComponent state."), *GetNameSafe(this));
 	return false;
 }
