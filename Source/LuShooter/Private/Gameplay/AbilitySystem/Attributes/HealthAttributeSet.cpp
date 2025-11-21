@@ -6,14 +6,6 @@
 #include "Net/UnrealNetwork.h"
 
 
-UHealthAttributeSet::UHealthAttributeSet()
-	: MaxHealth(100.f),
-	  Health(100.f),
-	  Healing(0.f),
-	  Damage(0.f)
-{
-}
-
 void UHealthAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue)
 {
 	Super::PreAttributeChange(Attribute, NewValue);
