@@ -7,6 +7,11 @@
 #include "Gameplay/AbilitySystem/Attributes/MovementAttributeSet.h"
 #include "Gameplay/Character/LuPlayerCharacter.h"
 
+UPlayerMovementComponent::UPlayerMovementComponent()
+{
+	bOrientRotationToMovement = true;
+}
+
 void UPlayerMovementComponent::BeginPlay()
 {
 	Super::BeginPlay();
