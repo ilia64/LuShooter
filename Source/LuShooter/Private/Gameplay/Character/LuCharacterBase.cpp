@@ -3,8 +3,8 @@
 #include "LuShooter/Public/Gameplay/Character/LuCharacterBase.h"
 #include "Gameplay/AbilitySystem/LuAbilitySystemComponent.h"
 #include "Gameplay/AbilitySystem/Attributes/HealthAttributeSet.h"
-#include "Gameplay/Character/Data/CharacterData.h"
-#include "Gameplay/Character/Data/CharacterDataAsset.h"
+#include "Gameplay/Character/Data/Character/CharacterData.h"
+#include "Gameplay/Character/Data/Character/CharacterDataAsset.h"
 
 DEFINE_LOG_CATEGORY(LogCharacter);
 

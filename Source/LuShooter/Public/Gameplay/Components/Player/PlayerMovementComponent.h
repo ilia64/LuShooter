@@ -11,6 +11,7 @@
 /* PlayerMovementComponent
  *  
  *  Console:
+ *  p.NetShowCorrections 1
  *	p.VisualizeMovement 1
  */
 
@@ -21,7 +22,7 @@ class LUSHOOTER_API UPlayerMovementComponent : public UCharacterMovementComponen
 
 public:
 	UPlayerMovementComponent();
-	
+
 	virtual void BeginPlay() override;
 
 private:
