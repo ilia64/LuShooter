@@ -5,6 +5,7 @@
 #include "Gameplay/AbilitySystem/Attributes/HealthAttributeSet.h"
 #include "Gameplay/Character/Data/Character/CharacterData.h"
 #include "Gameplay/Character/Data/Character/CharacterDataAsset.h"
+#include "Gameplay/Components/Character/FootstepComponent.h"
 
 DEFINE_LOG_CATEGORY(LogCharacter);
 
@@ -15,6 +16,7 @@ ALuCharacterBase::ALuCharacterBase(const FObjectInitializer& ObjectInitializer)
 	AbilitySystemComponent->SetIsReplicated(true);
 
 	HealthAttributeSet = ObjectInitializer.CreateDefaultSubobject<UHealthAttributeSet>(this, TEXT("HealthAttributeSet"));
+	FootstepComponent = ObjectInitializer.CreateDefaultSubobject<UFootstepComponent>(this, TEXT("FootstepComponent"));
 }
 
 UAbilitySystemComponent* ALuCharacterBase::GetAbilitySystemComponent() const
@@ -35,13 +37,10 @@ void ALuCharacterBase::BeginPlay()
 
 	if (HasAuthority())
 	{
-		if (InitDataAsset.IsValid())
+		//TODO use StreamableManager under LoadSynchronous
+		if (const UCharacterDataAsset* DataAsset = InitDataAsset.LoadSynchronous())
 		{
-			//TODO use StreamableManager under LoadSynchronous
-			if (const UCharacterDataAsset* DataAsset = InitDataAsset.LoadSynchronous())
-			{
-				InitializeDefaultsFromData(DataAsset->Data);
-			}
+			InitializeDefaultsFromData(DataAsset->Data);
 		}
 
 		InitializeStartupAbilities();

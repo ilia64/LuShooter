@@ -13,6 +13,7 @@ public class LuShooter : ModuleRules
 			"Core",
 			"CoreUObject",
 			"Engine",
+			"PhysicsCore",
 			"GameplayTags",
 			"GameplayTasks",
 			"GameplayAbilities"

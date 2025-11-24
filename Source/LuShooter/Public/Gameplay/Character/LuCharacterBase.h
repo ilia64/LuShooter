@@ -10,6 +10,7 @@
 struct FGameplayEffectSpecHandle;
 struct FCharacterData;
 struct FGameplayEffectContextHandle;
+class UFootstepComponent;
 class UCharacterDataAsset;
 class UCharacterAnimationDataAsset;
 class UGameplayEffect;
@@ -29,6 +30,7 @@ public:
 
 	FORCEINLINE UHealthAttributeSet* GetHealthAttributeSet() const { return HealthAttributeSet; }
 	FORCEINLINE UCharacterAnimationDataAsset* GetAnimationData() const { return AnimationData; }
+	FORCEINLINE UFootstepComponent* GetFootstepComponent() const { return FootstepComponent; }
 
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
@@ -66,4 +68,7 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	TObjectPtr<UHealthAttributeSet> HealthAttributeSet;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	TObjectPtr<UFootstepComponent> FootstepComponent;
 };
