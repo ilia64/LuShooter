@@ -16,8 +16,20 @@ UFootstepComponent::UFootstepComponent()
 	SetIsReplicatedByDefault(false);
 }
 
+void UFootstepComponent::BeginPlay()
+{
+	Super::BeginPlay();
+
+	bIsDedicatedServer = UKismetSystemLibrary::IsDedicatedServer(GetOwner());
+}
+
 void UFootstepComponent::HandleFootstep(const EFoot Foot) const
 {
+	if (bIsDedicatedServer)
+	{
+		return;
+	}
+
 	if (const ACharacter* Character = GetOwner<ACharacter>())
 	{
 		const int32 DebugShowFootsteps = CVarShowFootsteps.GetValueOnAnyThread();

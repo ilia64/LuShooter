@@ -21,18 +21,23 @@ class LUSHOOTER_API UFootstepComponent : public UActorComponent
 public:
 	UFootstepComponent();
 
+	virtual void BeginPlay() override;
+
 	void HandleFootstep(const EFoot Foot) const;
 
 protected:
 	UPROPERTY(EditDefaultsOnly, Category="123|Footstep")
-	FName LeftFootSocketName{TEXT("LeftFootSocket")};
+	FName LeftFootSocketName{TEXT("foot_l_Socket")};
 
 	UPROPERTY(EditDefaultsOnly, Category="123|Footstep")
-	FName RightFootSocketName{TEXT("RightFootSocket")};
+	FName RightFootSocketName{TEXT("foot_r_Socket")};
 
 	UPROPERTY(EditDefaultsOnly, Category="123|Footstep")
 	FVector TraceStartOffset{FVector::UpVector * 20.f};
 
 	UPROPERTY(EditDefaultsOnly, Category="123|Footstep")
 	FVector TraceEndOffset{FVector::DownVector * 30.f};
+
+private:
+	bool bIsDedicatedServer;
 };
