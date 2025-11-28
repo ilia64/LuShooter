@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "AbilitySystemInterface.h"
+#include "ActiveGameplayEffectHandle.h"
 #include "GameFramework/Character.h"
 #include "LuCharacterBase.generated.h"
 
@@ -14,7 +15,7 @@ class UFootstepComponent;
 class UCharacterDataAsset;
 class UCharacterAnimationDataAsset;
 class UGameplayEffect;
-class UGameplayAbility;
+class ULuGameplayAbility;
 class ULuAbilitySystemComponent;
 class UHealthAttributeSet;
 
@@ -38,8 +39,8 @@ public:
 	virtual void BeginPlay() override;
 
 	FGameplayEffectContextHandle GetGameplayEffectContextSelf() const;
-	bool ApplyGameplayEffectToSelf(const TSubclassOf<UGameplayEffect>& EffectClass, const FGameplayEffectContextHandle& EffectContext) const;
-	bool ApplyGameplayEffectToSelf(const FGameplayEffectSpecHandle& SpecHandle) const;
+	FActiveGameplayEffectHandle ApplyGameplayEffectToSelf(const TSubclassOf<UGameplayEffect>& EffectClass, const FGameplayEffectContextHandle& EffectContext) const;
+	FActiveGameplayEffectHandle ApplyGameplayEffectToSelf(const FGameplayEffectSpecHandle& SpecHandle) const;
 
 private:
 	void InitializeDefaultsFromData(const FCharacterData& Data);
@@ -57,7 +58,7 @@ private:
 	TObjectPtr<UCharacterAnimationDataAsset> AnimationData;
 
 	UPROPERTY(EditAnywhere, Category="123|Defaults")
-	TArray<TSubclassOf<UGameplayAbility>> StartupAbilities;
+	TArray<TSubclassOf<ULuGameplayAbility>> StartupAbilities;
 
 	UPROPERTY(EditAnywhere, Category="123|Defaults")
 	TArray<TSubclassOf<UGameplayEffect>> StartupEffects;

@@ -7,9 +7,14 @@
 #include "AbilitySystemLog.h"
 #include "Gameplay/Character/LuCharacterBase.h"
 
-ALuCharacterBase* ULuGameplayAbility::GetAvatarCharacterFromActorInfo() const
+int32 ULuGameplayAbility::GetInputId() const
 {
-	return Cast<ALuCharacterBase>(GetAvatarActorFromActorInfo());
+	if (InputID == EAbilityInputID::None)
+	{
+		return INDEX_NONE;
+	}
+
+	return static_cast<int32>(InputID);
 }
 
 void ULuGameplayAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
@@ -18,7 +23,7 @@ void ULuGameplayAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle
 
 	if (ActorInfo->IsNetAuthority())
 	{
-		const ALuCharacterBase* Character = GetAvatarCharacterFromActorInfo();
+		const ALuCharacterBase* Character = Cast<ALuCharacterBase>(ActorInfo->AvatarActor);
 
 		FGameplayEffectContextHandle ContextHandle = Character->GetGameplayEffectContextSelf();
 		ContextHandle.SetAbility(this);

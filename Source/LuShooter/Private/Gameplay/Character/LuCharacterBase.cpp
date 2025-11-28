@@ -2,6 +2,7 @@
 
 #include "LuShooter/Public/Gameplay/Character/LuCharacterBase.h"
 #include "Gameplay/AbilitySystem/LuAbilitySystemComponent.h"
+#include "Gameplay/AbilitySystem/Ability/LuGameplayAbility.h"
 #include "Gameplay/AbilitySystem/Attributes/HealthAttributeSet.h"
 #include "Gameplay/Character/Data/Character/CharacterData.h"
 #include "Gameplay/Character/Data/Character/CharacterDataAsset.h"
@@ -68,8 +69,8 @@ void ALuCharacterBase::InitializeDefaultsFromData(const FCharacterData& Data)
 				}
 			}
 
-			const bool bResult = ApplyGameplayEffectToSelf(SpecHandle);
-			if (!bResult)
+			const FActiveGameplayEffectHandle EffectHandle = ApplyGameplayEffectToSelf(SpecHandle);
+			if (!EffectHandle.WasSuccessfullyApplied())
 			{
 				UE_LOG(LogCharacter, Error, TEXT("Failed to apply AttributeInitializerEffect: %s to %s"), *GetNameSafe(AttributeInitializerEffect.Get()), *GetNameSafe(this));
 			}
@@ -110,7 +111,7 @@ void ALuCharacterBase::InitializeStartupAbilities()
 	{
 		if (Ability.Get())
 		{
-			FGameplayAbilitySpecHandle Handle = AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec{Ability});
+			FGameplayAbilitySpecHandle Handle = AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec{Ability, 1, Ability.GetDefaultObject()->GetInputId()});
 			if (!Handle.IsValid())
 			{
 				UE_LOG(LogCharacter, Warning, TEXT("Failed to give ability %s to %s"), *GetNameSafe(Ability.Get()), *GetNameSafe(this));
@@ -132,8 +133,8 @@ void ALuCharacterBase::InitializeStartupEffects()
 	{
 		if (EffectClass.Get())
 		{
-			const bool bResult = ApplyGameplayEffectToSelf(EffectClass, EffectContext);
-			if (!bResult)
+			const FActiveGameplayEffectHandle EffectHandle = ApplyGameplayEffectToSelf(EffectClass, EffectContext);
+			if (!EffectHandle.WasSuccessfullyApplied())
 			{
 				UE_LOG(LogCharacter, Error, TEXT("Failed to apply %s to %s from StartupEffects"), *GetNameSafe(EffectClass), *GetNameSafe(this));
 			}
@@ -154,7 +155,7 @@ FGameplayEffectContextHandle ALuCharacterBase::GetGameplayEffectContextSelf() co
 	return EffectContext;
 }
 
-bool ALuCharacterBase::ApplyGameplayEffectToSelf(const TSubclassOf<UGameplayEffect>& EffectClass, const FGameplayEffectContextHandle& EffectContext) const
+FActiveGameplayEffectHandle ALuCharacterBase::ApplyGameplayEffectToSelf(const TSubclassOf<UGameplayEffect>& EffectClass, const FGameplayEffectContextHandle& EffectContext) const
 {
 	check(EffectClass.Get());
 	check(EffectContext.IsValid());
@@ -163,17 +164,16 @@ bool ALuCharacterBase::ApplyGameplayEffectToSelf(const TSubclassOf<UGameplayEffe
 	return ApplyGameplayEffectToSelf(SpecHandle);
 }
 
-bool ALuCharacterBase::ApplyGameplayEffectToSelf(const FGameplayEffectSpecHandle& SpecHandle) const
+FActiveGameplayEffectHandle ALuCharacterBase::ApplyGameplayEffectToSelf(const FGameplayEffectSpecHandle& SpecHandle) const
 {
 	check(HasAuthority());
 	check(AbilitySystemComponent);
 
 	if (SpecHandle.IsValid())
 	{
-		const FActiveGameplayEffectHandle EffectHandle = AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
-		return EffectHandle.WasSuccessfullyApplied();
+		return AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
 	}
 
 	UE_LOG(LogCharacter, Error, TEXT("Attempted to apply invalid GameplayEffectSpec to character %s. SpecHandle is not valid — check effect class and AbilitySystemComponent state."), *GetNameSafe(this));
-	return false;
+	return {};
 }

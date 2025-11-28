@@ -30,6 +30,7 @@ void ALuPlayerCharacter::PawnClientRestart()
 	{
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 		{
+			Subsystem->ClearAllMappings();
 			Subsystem->AddMappingContext(GameplayInputMapping, 0);
 		}
 	}
@@ -41,13 +42,28 @@ void ALuPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 	{
 		EnhancedInputComponent->BindAction(LookInputAction, ETriggerEvent::Triggered, this, &ThisClass::OnLookInputAction);
 		EnhancedInputComponent->BindAction(MoveInputAction, ETriggerEvent::Triggered, this, &ThisClass::OnMoveInputAction);
-		EnhancedInputComponent->BindAction(JumpInputAction, ETriggerEvent::Started, this, &ACharacter::Jump);
-		EnhancedInputComponent->BindAction(JumpInputAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
+
+		const FGameplayAbilityInputBinds BindInfo = FGameplayAbilityInputBinds(
+			TEXT(""),
+			TEXT(""),
+			FTopLevelAssetPath(TEXT("/Script/LuShooter"), TEXT("EAbilityInputID")),
+			INDEX_NONE,
+			INDEX_NONE
+		);
+
+		AbilitySystemComponent->BindAbilityActivationToInputComponent(EnhancedInputComponent, BindInfo);
 	}
 	else
 	{
 		UE_LOG(LogCharacter, Error, TEXT("'%s' No Enhanced Input Component."), *GetNameSafe(this));
 	}
+}
+
+void ALuPlayerCharacter::Landed(const FHitResult& Hit)
+{
+	Super::Landed(Hit);
+
+	AbilitySystemComponent->RemoveActiveEffectsWithTags(InAirTags);
 }
 
 void ALuPlayerCharacter::OnLookInputAction(const FInputActionValue& Value)

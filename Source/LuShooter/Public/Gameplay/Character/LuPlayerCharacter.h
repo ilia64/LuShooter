@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "LuCharacterBase.h"
 #include "LuPlayerCharacter.generated.h"
 
@@ -23,8 +24,8 @@ public:
 
 	virtual void PawnClientRestart() override;
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
+	virtual void Landed(const FHitResult& Hit) override;
 
-public:
 	static FName MovementAttributeSetName;
 
 protected:
@@ -40,8 +41,8 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category="123|Input")
 	TObjectPtr<UInputAction> MoveInputAction;
 
-	UPROPERTY(EditDefaultsOnly, Category="123|Input")
-	TObjectPtr<UInputAction> JumpInputAction;
+	UPROPERTY(EditAnywhere, Category="123|Tags")
+	FGameplayTagContainer InAirTags;
 
 private:
 	void OnLookInputAction(const FInputActionValue& Value);
