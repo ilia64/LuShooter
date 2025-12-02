@@ -9,7 +9,6 @@
 
 UGameplayAbility_Jump::UGameplayAbility_Jump()
 {
-	InputID = EAbilityInputID::Jump;
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
 	NetExecutionPolicy = EGameplayAbilityNetExecutionPolicy::LocalPredicted;
 }

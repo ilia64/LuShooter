@@ -111,7 +111,11 @@ void ALuCharacterBase::InitializeStartupAbilities()
 	{
 		if (Ability.Get())
 		{
-			FGameplayAbilitySpecHandle Handle = AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec{Ability, 1, Ability.GetDefaultObject()->GetInputId()});
+			FGameplayTag InputTag = Ability.GetDefaultObject()->GetInputTag();
+			FGameplayAbilitySpec AbilitySpec{Ability, 1, INDEX_NONE, this};
+			AbilitySpec.DynamicAbilityTags.AddTag(InputTag);
+
+			FGameplayAbilitySpecHandle Handle = AbilitySystemComponent->GiveAbility(AbilitySpec);
 			if (!Handle.IsValid())
 			{
 				UE_LOG(LogCharacter, Warning, TEXT("Failed to give ability %s to %s"), *GetNameSafe(Ability.Get()), *GetNameSafe(this));

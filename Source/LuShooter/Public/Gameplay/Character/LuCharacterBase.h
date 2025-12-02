@@ -29,6 +29,7 @@ class LUSHOOTER_API ALuCharacterBase : public ACharacter, public IAbilitySystemI
 public:
 	explicit ALuCharacterBase(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
+	FORCEINLINE ULuAbilitySystemComponent* GetLuAbilitySystemComponent() const { return AbilitySystemComponent; }
 	FORCEINLINE UHealthAttributeSet* GetHealthAttributeSet() const { return HealthAttributeSet; }
 	FORCEINLINE UCharacterAnimationDataAsset* GetAnimationData() const { return AnimationData; }
 	FORCEINLINE UFootstepComponent* GetFootstepComponent() const { return FootstepComponent; }

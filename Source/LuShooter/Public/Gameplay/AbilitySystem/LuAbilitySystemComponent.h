@@ -14,4 +14,7 @@ class LUSHOOTER_API ULuAbilitySystemComponent : public UAbilitySystemComponent
 
 public:
 	ULuAbilitySystemComponent();
+
+	void AbilityInputPressed(const FGameplayTag InputTag);
+	void AbilityInputReleased(const FGameplayTag InputTag);
 };

@@ -42,16 +42,6 @@ void ALuPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 	{
 		EnhancedInputComponent->BindAction(LookInputAction, ETriggerEvent::Triggered, this, &ThisClass::OnLookInputAction);
 		EnhancedInputComponent->BindAction(MoveInputAction, ETriggerEvent::Triggered, this, &ThisClass::OnMoveInputAction);
-
-		const FGameplayAbilityInputBinds BindInfo = FGameplayAbilityInputBinds(
-			TEXT(""),
-			TEXT(""),
-			FTopLevelAssetPath(TEXT("/Script/LuShooter"), TEXT("EAbilityInputID")),
-			INDEX_NONE,
-			INDEX_NONE
-		);
-
-		AbilitySystemComponent->BindAbilityActivationToInputComponent(EnhancedInputComponent, BindInfo);
 	}
 	else
 	{

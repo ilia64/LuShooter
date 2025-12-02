@@ -6,22 +6,13 @@
 #include "Abilities/GameplayAbility.h"
 #include "LuGameplayAbility.generated.h"
 
-class ALuCharacterBase;
-
-UENUM(BlueprintType)
-enum class EAbilityInputID : uint8
-{
-	None UMETA(DisplayName = "None"),
-	Jump UMETA(DisplayName = "Jump"),
-};
-
 UCLASS(Abstract)
 class LUSHOOTER_API ULuGameplayAbility : public UGameplayAbility
 {
 	GENERATED_BODY()
 
 public:
-	int32 GetInputId() const;
+	FORCEINLINE FGameplayTag GetInputTag() const { return InputTag; };
 
 protected:
 	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
@@ -29,7 +20,7 @@ protected:
 
 protected:
 	UPROPERTY(EditDefaultsOnly, Category="Input")
-	EAbilityInputID InputID{0};
+	FGameplayTag InputTag;
 
 	UPROPERTY(EditDefaultsOnly, Category="Effects")
 	TArray<TSubclassOf<UGameplayEffect>> OngoingEffects;

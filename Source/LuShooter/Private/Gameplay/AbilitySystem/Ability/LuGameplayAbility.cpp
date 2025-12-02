@@ -7,15 +7,6 @@
 #include "AbilitySystemLog.h"
 #include "Gameplay/Character/LuCharacterBase.h"
 
-int32 ULuGameplayAbility::GetInputId() const
-{
-	if (InputID == EAbilityInputID::None)
-	{
-		return INDEX_NONE;
-	}
-
-	return static_cast<int32>(InputID);
-}
 
 void ULuGameplayAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
