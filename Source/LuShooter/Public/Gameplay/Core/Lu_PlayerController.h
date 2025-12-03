@@ -6,6 +6,7 @@
 #include "GameFramework/PlayerController.h"
 #include "Lu_PlayerController.generated.h"
 
+struct FInputActionValue;
 struct FGameplayTag;
 class UPlayerInputDataAsset;
 
@@ -22,6 +23,9 @@ protected:
 	TObjectPtr<UPlayerInputDataAsset> InputData;
 
 private:
+	void OnLookInputAction(const FInputActionValue& Value);
+	void OnMoveInputAction(const FInputActionValue& Value);
+
 	void AbilityInputPressed(const FGameplayTag InputTag);
 	void AbilityInputReleased(const FGameplayTag InputTag);
 };

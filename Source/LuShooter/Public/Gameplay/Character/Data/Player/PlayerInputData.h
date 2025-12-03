@@ -7,6 +7,7 @@
 #include "UObject/Object.h"
 #include "PlayerInputData.generated.h"
 
+class UInputMappingContext;
 class UInputAction;
 
 
@@ -29,6 +30,15 @@ class UPlayerInputDataAsset : public UDataAsset
 	GENERATED_BODY()
 
 public:
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<UInputMappingContext> GameplayInputMapping;
+
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<UInputAction> LookInputAction;
+
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<UInputAction> MoveInputAction;
+
 	UPROPERTY(EditDefaultsOnly)
 	TArray<FPlayerInputAction> AbilityInputActions;
 };
