@@ -8,6 +8,7 @@
 #include "Gameplay/Character/LuPlayerCharacter.h"
 #include "Gameplay/Character/Data/Player/PlayerInputData.h"
 #include "Gameplay/Components/Player/PlayerEnhancedInputComponent.h"
+#include "UI/HUD/PlayerHUD.h"
 
 class UEnhancedInputLocalPlayerSubsystem;
 
