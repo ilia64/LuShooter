@@ -42,13 +42,27 @@ void APlayerHUD::OnPawnChanged(APawn* OldPawn, APawn* NewPawn)
 	}
 
 	const UHUDLayoutSettings* Settings = GetDefault<UHUDLayoutSettings>();
-	if (!Settings || !Settings->DefaultLayout.IsValid())
+	if (!Settings)
 	{
+		UE_LOG(LogTemp, Error, TEXT("%hs: No default layout"), __FUNCTION__);
+
 		return;
 	}
 
-	UClass* LayoutClass = Settings->DefaultLayout.LoadSynchronous();
+	if (Settings->DefaultLayout.IsNull())
+	{
+		UE_LOG(LogTemp, Error, TEXT("%hs: Default layout class is Null"), __FUNCTION__);
 
-	Layout = CreateWidget<UUserWidget>(GetWorld(), LayoutClass);
-	Layout->AddToViewport(0);
+		return;
+	}
+
+	if (UClass* LayoutClass = Settings->DefaultLayout.LoadSynchronous())
+	{
+		Layout = CreateWidget<UUserWidget>(GetWorld(), LayoutClass);
+		Layout->AddToViewport(0);
+	}
+	else
+	{
+		ensureMsgf(0, TEXT("%hs: Can't create layout for default layout"), __FUNCTION__);
+	}
 }
