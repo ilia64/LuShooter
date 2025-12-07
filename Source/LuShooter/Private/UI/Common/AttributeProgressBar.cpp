@@ -5,15 +5,6 @@
 
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemGlobals.h"
-#include "Components/Image.h"
-
-void UAttributeProgressBar::NativePreConstruct()
-{
-	Super::NativePreConstruct();
-
-	ProgressBar_Image->SetRenderTransformPivot({0.f, 0.f});
-	ProgressBar_Image->SetRenderScale({0.5, 1.f});
-}
 
 void UAttributeProgressBar::NativeConstruct()
 {
@@ -26,6 +17,11 @@ void UAttributeProgressBar::NativeConstruct()
 	UpdateView();
 }
 
+void UAttributeProgressBar::ProgressChanged_Implementation(const float Progress, const float Value, const float MaxValue)
+{
+	GEngine->AddOnScreenDebugMessage(INDEX_NONE, 5, FColor::Cyan, FString::Printf(TEXT("%s Progress:%d %d / %d"), *ValueAttribute.AttributeName, FMath::RoundToInt(100 * Progress), FMath::RoundToInt(Value), FMath::RoundToInt(MaxValue)));
+}
+
 void UAttributeProgressBar::OnAttributeChanged(const FOnAttributeChangeData& Data)
 {
 	if (Data.NewValue == Data.OldValue)
@@ -36,11 +32,11 @@ void UAttributeProgressBar::OnAttributeChanged(const FOnAttributeChangeData& Dat
 	UpdateView();
 }
 
-void UAttributeProgressBar::UpdateView() const
+void UAttributeProgressBar::UpdateView()
 {
 	const float Value = AbilitySystemComponent->GetNumericAttribute(ValueAttribute);
 	const float MaxValue = AbilitySystemComponent->GetNumericAttribute(MaxValueAttribute);
 	const float Percent = Value / MaxValue;
 
-	ProgressBar_Image->SetRenderScale({Percent, 1.f});
+	ProgressChanged(Percent, Value, MaxValue);
 }

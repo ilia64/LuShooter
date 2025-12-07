@@ -16,23 +16,22 @@ class LUSHOOTER_API UAttributeProgressBar : public UUserWidget
 	GENERATED_BODY()
 
 protected:
-	virtual void NativePreConstruct() override;
 	virtual void NativeConstruct() override;
 
-private:
+	UFUNCTION(BlueprintNativeEvent)
+	void ProgressChanged(const float Progress, const float Value, const float MaxValue);
+
+protected:
 	UPROPERTY(EditAnywhere, Category="123")
 	FGameplayAttribute ValueAttribute;
 
 	UPROPERTY(EditAnywhere, Category="123")
 	FGameplayAttribute MaxValueAttribute;
 
-	UPROPERTY(EditDefaultsOnly, meta=(BindWidget))
-	TObjectPtr<UImage> ProgressBar_Image;
-
 private:
 	void OnAttributeChanged(const FOnAttributeChangeData& Data);
 
-	void UpdateView() const;
+	void UpdateView();
 
 private:
 	UPROPERTY()
