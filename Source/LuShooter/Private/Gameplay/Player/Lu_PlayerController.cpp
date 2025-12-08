@@ -1,16 +1,30 @@
 ﻿// Copyright Epic Games, Inc. All Rights Reserved.
 
 
-#include "Gameplay/Core/Lu_PlayerController.h"
+#include "Gameplay/Player//Lu_PlayerController.h"
 
+#include "AbilitySystemGlobals.h"
 #include "EnhancedInputSubsystems.h"
 #include "Gameplay/AbilitySystem/LuAbilitySystemComponent.h"
 #include "Gameplay/Character/LuPlayerCharacter.h"
 #include "Gameplay/Character/Data/Player/PlayerInputData.h"
 #include "Gameplay/Components/Player/PlayerEnhancedInputComponent.h"
-#include "UI/HUD/PlayerHUD.h"
 
 class UEnhancedInputLocalPlayerSubsystem;
+
+void ALu_PlayerController::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+
+#if !UE_BUILD_SHIPPING
+	EnableCheats();
+#endif
+}
+
+UAbilitySystemComponent* ALu_PlayerController::GetAbilitySystemComponent() const
+{
+	return UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(GetPawn());
+}
 
 void ALu_PlayerController::SetupInputComponent()
 {

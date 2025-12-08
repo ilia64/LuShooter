@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AbilitySystemInterface.h"
 #include "GameFramework/PlayerController.h"
 #include "Lu_PlayerController.generated.h"
 
@@ -11,11 +12,15 @@ struct FGameplayTag;
 class UPlayerInputDataAsset;
 
 UCLASS(Abstract)
-class LUSHOOTER_API ALu_PlayerController : public APlayerController
+class LUSHOOTER_API ALu_PlayerController : public APlayerController, public IAbilitySystemInterface
 {
 	GENERATED_BODY()
 
+public:
+	virtual void PostInitializeComponents() override;
+
 protected:
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	virtual void SetupInputComponent() override;
 
 protected:
