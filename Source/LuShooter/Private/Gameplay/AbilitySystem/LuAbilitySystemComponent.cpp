@@ -17,20 +17,21 @@ void ULuAbilitySystemComponent::AbilityInputPressed(const FGameplayTag InputTag)
 	}
 
 	ABILITYLIST_SCOPE_LOCK();
-	for (const FGameplayAbilitySpec& Spec : ActivatableAbilities.Items)
+	for (FGameplayAbilitySpec& Spec : ActivatableAbilities.Items)
 	{
-		if (!Spec.DynamicAbilityTags.HasTagExact(InputTag))
+		if (Spec.DynamicAbilityTags.HasTagExact(InputTag))
 		{
-			continue;
-		}
+			Spec.InputPressed = true;
 
-		if (Spec.IsActive())
-		{
-			InvokeReplicatedEvent(EAbilityGenericReplicatedEvent::InputPressed, Spec.Handle, Spec.ActivationInfo.GetActivationPredictionKey());
-		}
-		else
-		{
-			TryActivateAbility(Spec.Handle);
+			if (Spec.IsActive())
+			{
+				//For AbilityTask WaitInputPressed
+				InvokeReplicatedEvent(EAbilityGenericReplicatedEvent::InputPressed, Spec.Handle, Spec.ActivationInfo.GetActivationPredictionKey());
+			}
+			else
+			{
+				TryActivateAbility(Spec.Handle);
+			}
 		}
 	}
 }
@@ -43,10 +44,21 @@ void ULuAbilitySystemComponent::AbilityInputReleased(const FGameplayTag InputTag
 	}
 
 	ABILITYLIST_SCOPE_LOCK();
-	for (const FGameplayAbilitySpec& Spec : ActivatableAbilities.Items)
+	for (FGameplayAbilitySpec& Spec : ActivatableAbilities.Items)
 	{
-		if (Spec.DynamicAbilityTags.HasTagExact(InputTag))
+		if (Spec.IsActive() && Spec.DynamicAbilityTags.HasTagExact(InputTag))
 		{
+			Spec.InputPressed = false;
+
+			// both methods -> UGameplayAbility::InputReleased(...);
+			if (Spec.Ability->bReplicateInputDirectly && IsOwnerActorAuthoritative() == false)
+			{
+				ServerSetInputReleased(Spec.Handle);
+			}
+
+			AbilitySpecInputReleased(Spec);
+
+			//For AbilityTask WaitInputRelease
 			InvokeReplicatedEvent(EAbilityGenericReplicatedEvent::InputReleased, Spec.Handle, Spec.ActivationInfo.GetActivationPredictionKey());
 		}
 	}
