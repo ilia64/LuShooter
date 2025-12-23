@@ -27,6 +27,7 @@ public class LuShooter : ModuleRules
 			"Slate",
 			"SlateCore",
 			"UMG",
+			"CommonUI",
 		});
 	}
 }
