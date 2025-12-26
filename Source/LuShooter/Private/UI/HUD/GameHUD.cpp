@@ -4,6 +4,7 @@
 #include "UI/HUD/GameHUD.h"
 #include "Blueprint/UserWidget.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "System/CommonUISubsystem.h"
 #include "UI/CommonUI/Lu_CommonUI.h"
 #include "UI/HUD/HUDLayoutSettings.h"
 #include "UI/CommonUI/PrimaryGameLayout.h"
@@ -67,19 +68,5 @@ void AGameHUD::OnPawnChanged(APawn* OldPawn, APawn* NewPawn)
 		return;
 	}
 
-	if (Settings->DefaultLayout.IsNull())
-	{
-		UE_LOG(LogTemp, Error, TEXT("%hs: Default layout class is Null"), __FUNCTION__);
-
-		return;
-	}
-
-	if (UClass* LayoutClass = Settings->DefaultLayout.LoadSynchronous())
-	{
-		UnitLayout = Container->AddWidget<UBaseHUDLayout>(LayoutClass);
-	}
-	else
-	{
-		ensureMsgf(0, TEXT("%hs: Can't create layout for default layout"), __FUNCTION__);
-	}
+	UCommonUISubsystem::Get(GetWorld())->PushWidgetAsync(UITag::Layer_Game, Settings->DefaultLayout);
 }

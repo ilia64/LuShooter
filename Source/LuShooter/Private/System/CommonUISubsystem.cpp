@@ -3,6 +3,12 @@
 
 #include "System/CommonUISubsystem.h"
 
+#include "GameplayTagContainer.h"
+#include "Engine/AssetManager.h"
+#include "UI/CommonUI/BaseActivatableWidget.h"
+#include "UI/CommonUI/PrimaryGameLayout.h"
+#include "Widgets/CommonActivatableWidgetContainer.h"
+
 UCommonUISubsystem* UCommonUISubsystem::Get(const UObject* ContextObject)
 {
 	const UWorld* World = GEngine->GetWorldFromContextObject(ContextObject, EGetWorldErrorMode::Assert);
@@ -27,4 +33,29 @@ void UCommonUISubsystem::RegisterPrimaryGameLayout(UPrimaryGameLayout* InPrimary
 {
 	check(InPrimaryGameLayout);
 	PrimaryGameLayout = InPrimaryGameLayout;
+}
+
+void UCommonUISubsystem::PushWidgetAsync(const FGameplayTag LayerTag, const TSoftClassPtr<UBaseActivatableWidget> WidgetSoftClass)
+{
+	check(!WidgetSoftClass.IsValid());
+
+	TWeakObjectPtr<UCommonUISubsystem> WeakThis(this);
+	UAssetManager::Get().GetStreamableManager().RequestAsyncLoad(WidgetSoftClass.ToSoftObjectPath(), FStreamableDelegate::CreateLambda([WeakThis, LayerTag, WidgetSoftClass]()
+	{
+		if (const UCommonUISubsystem* StrongThis = WeakThis.Get())
+		{
+			const TSubclassOf<UBaseActivatableWidget> WidgetClass = WidgetSoftClass.Get();
+			StrongThis->PushWidget(LayerTag, WidgetClass);
+		}
+	}));
+}
+
+void UCommonUISubsystem::PushWidget(const FGameplayTag LayerTag, const TSubclassOf<UBaseActivatableWidget> WidgetClass) const
+{
+	check(WidgetClass);
+
+	UCommonActivatableWidgetContainerBase* LayerContainer = PrimaryGameLayout->GetLayer(LayerTag);
+	check(LayerContainer);
+
+	LayerContainer->AddWidget<UBaseActivatableWidget>(WidgetClass);
 }
