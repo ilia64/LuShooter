@@ -8,6 +8,7 @@
 #include "PrimaryGameLayout.generated.h"
 
 class UCommonActivatableWidgetContainerBase;
+class UCommonActivatableWidgetStack;
 
 UCLASS(Abstract, meta=(DisableNativeTick))
 class LUSHOOTER_API UPrimaryGameLayout : public UCommonUserWidget
@@ -18,6 +19,8 @@ public:
 	FORCEINLINE UCommonActivatableWidgetContainerBase* GetLayer(const FGameplayTag Tag) const { return LayerByTag.FindRef(Tag); }
 
 protected:
+	virtual void NativeOnInitialized() override;
+	
 	UFUNCTION(BlueprintCallable)
 	void RegisterLayer(UPARAM(meta = (Categories = "UI.Layer")) const FGameplayTag Tag, UCommonActivatableWidgetContainerBase* Container);
 

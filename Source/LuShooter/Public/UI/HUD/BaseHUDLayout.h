@@ -3,11 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Blueprint/UserWidget.h"
+#include "CommonActivatableWidget.h"
 #include "BaseHUDLayout.generated.h"
 
 UCLASS(Abstract)
-class LUSHOOTER_API UBaseHUDLayout : public UUserWidget
+class LUSHOOTER_API UBaseHUDLayout : public UCommonActivatableWidget
 {
 	GENERATED_BODY()
 };

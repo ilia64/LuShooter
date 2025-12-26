@@ -18,7 +18,8 @@ public class LuShooter : ModuleRules
 			"EnhancedInput",
 			"GameplayTags",
 			"GameplayTasks",
-			"GameplayAbilities"
+			"GameplayAbilities",
+			"CommonUI",
 		});
 
 		PrivateDependencyModuleNames.AddRange(new string[]
@@ -27,7 +28,6 @@ public class LuShooter : ModuleRules
 			"Slate",
 			"SlateCore",
 			"UMG",
-			"CommonUI",
 		});
 	}
 }

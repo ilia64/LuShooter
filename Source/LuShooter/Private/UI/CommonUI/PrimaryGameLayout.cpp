@@ -3,7 +3,15 @@
 
 #include "UI/CommonUI/PrimaryGameLayout.h"
 #include "GameplayTagContainer.h"
+#include "System/CommonUISubsystem.h"
 
+
+void UPrimaryGameLayout::NativeOnInitialized()
+{
+	Super::NativeOnInitialized();
+
+	UCommonUISubsystem::Get(this)->RegisterPrimaryGameLayout(this);
+}
 
 void UPrimaryGameLayout::RegisterLayer(const FGameplayTag Tag, UCommonActivatableWidgetContainerBase* Container)
 {
