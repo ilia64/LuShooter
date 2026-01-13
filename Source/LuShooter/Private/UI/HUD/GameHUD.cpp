@@ -68,5 +68,12 @@ void AGameHUD::OnPawnChanged(APawn* OldPawn, APawn* NewPawn)
 		return;
 	}
 
-	UCommonUISubsystem::Get(GetWorld())->PushWidgetAsync(UITag::Layer_Game, Settings->DefaultLayout);
+	UCommonUISubsystem* CommonUISubsystem = UCommonUISubsystem::Get(GetWorld());
+	CommonUISubsystem->PushWidgetAsync(UITag::Layer_Game, Settings->DefaultLayout, GetOwningPlayerController(), [](EPushActivatableWidgetStatus Status, UBaseActivatableWidget* Widget)
+	{
+		if (Status == Added)
+		{
+			UE_LOG(LogCommonUI, Log, TEXT("HUD: Set default layout to %s"), *GetNameSafe(Widget));
+		}
+	});
 }

@@ -9,6 +9,8 @@
 #include "UI/CommonUI/PrimaryGameLayout.h"
 #include "Widgets/CommonActivatableWidgetContainer.h"
 
+DEFINE_LOG_CATEGORY(LogCommonUI);
+
 UCommonUISubsystem* UCommonUISubsystem::Get(const UObject* ContextObject)
 {
 	const UWorld* World = GEngine->GetWorldFromContextObject(ContextObject, EGetWorldErrorMode::Assert);
@@ -31,31 +33,86 @@ bool UCommonUISubsystem::ShouldCreateSubsystem(UObject* Outer) const
 
 void UCommonUISubsystem::RegisterPrimaryGameLayout(UPrimaryGameLayout* InPrimaryGameLayout)
 {
-	check(InPrimaryGameLayout);
 	PrimaryGameLayout = InPrimaryGameLayout;
+	check(PrimaryGameLayout);
 }
 
-void UCommonUISubsystem::PushWidgetAsync(const FGameplayTag LayerTag, const TSoftClassPtr<UBaseActivatableWidget> WidgetSoftClass)
+void UCommonUISubsystem::PushWidgetAsync(const FGameplayTag LayerTag, const TSoftClassPtr<UBaseActivatableWidget> WidgetSoftClass, APlayerController* PlayerController, FOnPushedWidgetCallback OnPushedCallback)
 {
-	check(!WidgetSoftClass.IsValid());
+	check(PrimaryGameLayout);
+
+	if (!LayerTag.IsValid() || WidgetSoftClass.IsNull() || !PlayerController || !PrimaryGameLayout->GetLayer(LayerTag))
+	{
+		UE_LOG(LogCommonUI, Error, TEXT("CommonUISubsystem::PushWidgetAsync FAILED Tag:%s, WidgetSoftClass:%s, PC:%s Layer:%s"), *LayerTag.ToString(), *WidgetSoftClass.ToString(), *GetNameSafe(PlayerController), *GetNameSafe(PrimaryGameLayout->GetLayer(LayerTag)));
+		ensureAlways(0);
+
+		if (OnPushedCallback)
+		{
+			OnPushedCallback(Failed, nullptr);
+		}
+
+		return;
+	}
 
 	TWeakObjectPtr<UCommonUISubsystem> WeakThis(this);
-	UAssetManager::Get().GetStreamableManager().RequestAsyncLoad(WidgetSoftClass.ToSoftObjectPath(), FStreamableDelegate::CreateLambda([WeakThis, LayerTag, WidgetSoftClass]()
+	TWeakObjectPtr<APlayerController> WeakPC(PlayerController);
+
+	FStreamableManager& StreamableManager = UAssetManager::Get().GetStreamableManager();
+	StreamableManager.RequestAsyncLoad(WidgetSoftClass.ToSoftObjectPath(), FStreamableDelegate::CreateLambda([WeakThis, LayerTag, WidgetSoftClass, WeakPC, Callback = MoveTemp(OnPushedCallback)]
 	{
 		if (const UCommonUISubsystem* StrongThis = WeakThis.Get())
 		{
 			const TSubclassOf<UBaseActivatableWidget> WidgetClass = WidgetSoftClass.Get();
-			StrongThis->PushWidget(LayerTag, WidgetClass);
+			if (!WidgetClass)
+			{
+				UE_LOG(LogCommonUI, Error, TEXT("PushWidget: WidgetClass is null! Layer: %s"), *LayerTag.ToString());
+				if (Callback)
+				{
+					Callback(Failed, nullptr);
+				}
+
+				return;
+			}
+
+			if (UCommonActivatableWidgetContainerBase* LayerContainer = StrongThis->PrimaryGameLayout->GetLayer(LayerTag))
+			{
+				UBaseActivatableWidget* Widget = LayerContainer->AddWidget<UBaseActivatableWidget>(WidgetClass, [WeakPC, Callback](UBaseActivatableWidget& InWidget)
+				{
+					if (WeakPC.IsValid())
+					{
+						InWidget.SetOwningPlayer(WeakPC.Get());
+					}
+
+					if (Callback)
+					{
+						Callback(Init, &InWidget);
+					}
+				});
+
+				if (Widget)
+				{
+					if (Callback)
+					{
+						Callback(Added, Widget);
+					}
+				}
+				else
+				{
+					UE_LOG(LogCommonUI, Error, TEXT("PushWidget: Widget is null! Layer: %s"), *LayerTag.ToString());
+					if (Callback)
+					{
+						Callback(Failed, nullptr);
+					}
+				}
+			}
+		}
+		else
+		{
+			UE_LOG(LogCommonUI, Error, TEXT("PushWidget: Widget is null! Layer: %s"), *LayerTag.ToString());
+			if (Callback)
+			{
+				Callback(Failed, nullptr);
+			}
 		}
 	}));
-}
-
-void UCommonUISubsystem::PushWidget(const FGameplayTag LayerTag, const TSubclassOf<UBaseActivatableWidget> WidgetClass) const
-{
-	check(WidgetClass);
-
-	UCommonActivatableWidgetContainerBase* LayerContainer = PrimaryGameLayout->GetLayer(LayerTag);
-	check(LayerContainer);
-
-	LayerContainer->AddWidget<UBaseActivatableWidget>(WidgetClass);
 }

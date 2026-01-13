@@ -10,6 +10,18 @@ struct FGameplayTag;
 class UBaseActivatableWidget;
 class UPrimaryGameLayout;
 
+UENUM()
+enum EPushActivatableWidgetStatus
+{
+	Init,
+	Added,
+	Failed,
+};
+
+typedef TFunction<void (const EPushActivatableWidgetStatus, UBaseActivatableWidget*)> FOnPushedWidgetCallback;
+
+DECLARE_LOG_CATEGORY_EXTERN(LogCommonUI, Log, All);
+
 UCLASS()
 class LUSHOOTER_API UCommonUISubsystem : public UGameInstanceSubsystem
 {
@@ -22,8 +34,7 @@ public:
 
 	void RegisterPrimaryGameLayout(UPrimaryGameLayout* InPrimaryGameLayout);
 
-	void PushWidgetAsync(const FGameplayTag LayerTag, const TSoftClassPtr<UBaseActivatableWidget> WidgetSoftClass);
-	void PushWidget(const FGameplayTag LayerTag, const TSubclassOf<UBaseActivatableWidget> WidgetClass) const;
+	void PushWidgetAsync(const FGameplayTag LayerTag, const TSoftClassPtr<UBaseActivatableWidget> WidgetSoftClass, APlayerController* PlayerController, FOnPushedWidgetCallback OnPushedCallback = FOnPushedWidgetCallback());
 
 private:
 	UPROPERTY(Transient)
