@@ -41,9 +41,10 @@ void UCommonUISubsystem::PushWidgetAsync(const FGameplayTag LayerTag, const TSof
 {
 	check(PrimaryGameLayout);
 
-	if (!LayerTag.IsValid() || WidgetSoftClass.IsNull() || !PlayerController || !PrimaryGameLayout->GetLayer(LayerTag))
+	const UCommonActivatableWidgetContainerBase* Layer = PrimaryGameLayout->GetLayer(LayerTag);
+	if (!LayerTag.IsValid() || WidgetSoftClass.IsNull() || !PlayerController || !Layer)
 	{
-		UE_LOG(LogCommonUI, Error, TEXT("CommonUISubsystem::PushWidgetAsync FAILED Tag:%s, WidgetSoftClass:%s, PC:%s Layer:%s"), *LayerTag.ToString(), *WidgetSoftClass.ToString(), *GetNameSafe(PlayerController), *GetNameSafe(PrimaryGameLayout->GetLayer(LayerTag)));
+		UE_LOG(LogCommonUI, Error, TEXT("CommonUISubsystem::PushWidgetAsync FAILED Tag:%s, WidgetSoftClass:%s, PC:%s Layer:%s"), *LayerTag.ToString(), *WidgetSoftClass.ToString(), *GetNameSafe(PlayerController), *GetNameSafe(Layer));
 		ensureAlways(0);
 
 		if (OnPushedCallback)
