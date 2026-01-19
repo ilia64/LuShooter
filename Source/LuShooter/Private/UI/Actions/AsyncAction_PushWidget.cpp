@@ -9,13 +9,19 @@
 
 UAsyncAction_PushWidget* UAsyncAction_PushWidget::PushWidget(const UObject* WorldContextObject, APlayerController* PlayerController, const TSoftClassPtr<UBaseActivatableWidget> WidgetClass, const FGameplayTag LayerTag, const bool bFocusOnNewlyPushedWidget)
 {
-	if (!ensureAlways(GEngine))
+	if (!ensure(!WidgetClass.IsNull()))
+	{
+		UE_LOG(LogCommonUI, Error, TEXT("AsyncAction_PushWidget::PushWidget: SoftClass is NULL Tag:%s"), *LayerTag.ToString());
+		return nullptr;
+	}
+
+	if (!ensure(GEngine))
 	{
 		return nullptr;
 	}
 
 	UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::Assert);
-	if (!ensureAlways(World))
+	if (!ensure(World))
 	{
 		return nullptr;
 	}
@@ -26,26 +32,34 @@ UAsyncAction_PushWidget* UAsyncAction_PushWidget::PushWidget(const UObject* Worl
 	Node->OwningWidgetClass = WidgetClass;
 	Node->OwningLayerTag = LayerTag;
 	Node->bOwningFocusOnNewlyPushedWidget = bFocusOnNewlyPushedWidget;
-
 	Node->RegisterWithGameInstance(World);
 	return Node;
 }
 
 void UAsyncAction_PushWidget::Activate()
 {
+	TWeakObjectPtr<UAsyncAction_PushWidget> WeakThis{this};
 	UCommonUISubsystem* CommonUISubsystem = UCommonUISubsystem::Get(OwningWorld.Get());
-	CommonUISubsystem->PushWidgetAsync(OwningLayerTag, OwningWidgetClass, OwningPlayerController.Get(), [this](const EPushActivatableWidgetStatus Status, UBaseActivatableWidget* Widget)
+	CommonUISubsystem->PushWidgetAsync(OwningLayerTag, OwningWidgetClass, OwningPlayerController.Get(), [WeakThis](const EPushActivatableWidgetStatus Status, UBaseActivatableWidget* Widget)
 	{
-		switch (Status)
+		if (WeakThis.IsValid())
 		{
-		case Init:
-			OnInit.Broadcast(Widget);
-			
-		case Added:
-			OnPushed.Broadcast(Widget);
+			switch (Status)
+			{
+			case Init:
+				WeakThis->OnInit.Broadcast(Widget);
+				break;
 
-		case Failed:
-			OnFailed.Broadcast();
+			case Added:
+				WeakThis->OnPushed.Broadcast(Widget);
+				WeakThis->SetReadyToDestroy();
+				break;
+
+			case Failed:
+				WeakThis->OnFailed.Broadcast();
+				WeakThis->SetReadyToDestroy();
+				break;
+			}
 		}
 	});
 }
