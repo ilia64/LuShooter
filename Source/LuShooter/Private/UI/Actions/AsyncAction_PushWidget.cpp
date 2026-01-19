@@ -51,6 +51,14 @@ void UAsyncAction_PushWidget::Activate()
 				break;
 
 			case Added:
+				if (WeakThis->bOwningFocusOnNewlyPushedWidget)
+				{
+					if (UWidget* WidgetToFocus = Widget->GetDesiredFocusTarget())
+					{
+						WidgetToFocus->SetFocus();
+					}
+				}
+
 				WeakThis->OnPushed.Broadcast(Widget);
 				WeakThis->SetReadyToDestroy();
 				break;
