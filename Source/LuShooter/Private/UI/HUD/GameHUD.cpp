@@ -5,7 +5,7 @@
 #include "Blueprint/UserWidget.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "System/CommonUISubsystem.h"
-#include "UI/CommonUI/Lu_CommonUI.h"
+#include "UI/CommonUI/CommonUI_Tags.h"
 #include "UI/HUD/HUDLayoutSettings.h"
 #include "UI/CommonUI/PrimaryGameLayout.h"
 #include "Widgets/CommonActivatableWidgetContainer.h"
