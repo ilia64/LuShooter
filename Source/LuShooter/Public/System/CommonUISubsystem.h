@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Subsystems/GameInstanceSubsystem.h"
+#include "CommonUISubsystemBase.h"
 #include "CommonUISubsystem.generated.h"
 
 struct FGameplayTag;
@@ -23,7 +23,7 @@ typedef TFunction<void (const EPushActivatableWidgetStatus, UBaseActivatableWidg
 DECLARE_LOG_CATEGORY_EXTERN(LogCommonUI, Log, All);
 
 UCLASS()
-class LUSHOOTER_API UCommonUISubsystem : public UGameInstanceSubsystem
+class LUSHOOTER_API UCommonUISubsystem : public UCommonUISubsystemBase
 {
 	GENERATED_BODY()
 
@@ -35,6 +35,8 @@ public:
 	void RegisterPrimaryGameLayout(UPrimaryGameLayout* InPrimaryGameLayout);
 
 	void PushWidgetAsync(const FGameplayTag LayerTag, const TSoftClassPtr<UBaseActivatableWidget> WidgetSoftClass, APlayerController* PlayerController, FOnPushedWidgetCallback OnPushedCallback = FOnPushedWidgetCallback());
+
+	void SuspendInput(const bool bValue, const FName Reason);
 
 private:
 	UPROPERTY(Transient)

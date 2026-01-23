@@ -55,13 +55,16 @@ void UCommonUISubsystem::PushWidgetAsync(const FGameplayTag LayerTag, const TSof
 		return;
 	}
 
+	static FName SuspendInputReason_PushingWidget("PushingWidget");
+	SuspendInput(true, SuspendInputReason_PushingWidget);
+
 	TWeakObjectPtr<UCommonUISubsystem> WeakThis(this);
 	TWeakObjectPtr<APlayerController> WeakPC(PlayerController);
 
 	FStreamableManager& StreamableManager = UAssetManager::Get().GetStreamableManager();
 	StreamableManager.RequestAsyncLoad(WidgetSoftClass.ToSoftObjectPath(), FStreamableDelegate::CreateLambda([WeakThis, LayerTag, WidgetSoftClass, WeakPC, Callback = MoveTemp(OnPushedCallback)]
 	{
-		if (const UCommonUISubsystem* StrongThis = WeakThis.Get())
+		if (UCommonUISubsystem* StrongThis = WeakThis.Get())
 		{
 			const TSubclassOf<UBaseActivatableWidget> WidgetClass = WidgetSoftClass.Get();
 			if (!WidgetClass)
@@ -71,6 +74,8 @@ void UCommonUISubsystem::PushWidgetAsync(const FGameplayTag LayerTag, const TSof
 				{
 					Callback(Failed, nullptr);
 				}
+
+				StrongThis->SuspendInput(false, SuspendInputReason_PushingWidget);
 
 				return;
 			}
@@ -95,6 +100,8 @@ void UCommonUISubsystem::PushWidgetAsync(const FGameplayTag LayerTag, const TSof
 					if (Callback)
 					{
 						Callback(Added, Widget);
+
+						StrongThis->SuspendInput(true, SuspendInputReason_PushingWidget);
 					}
 				}
 				else
@@ -103,6 +110,8 @@ void UCommonUISubsystem::PushWidgetAsync(const FGameplayTag LayerTag, const TSof
 					if (Callback)
 					{
 						Callback(Failed, nullptr);
+
+						StrongThis->SuspendInput(true, SuspendInputReason_PushingWidget);
 					}
 				}
 			}
@@ -116,4 +125,17 @@ void UCommonUISubsystem::PushWidgetAsync(const FGameplayTag LayerTag, const TSof
 			}
 		}
 	}));
+}
+
+void UCommonUISubsystem::SuspendInput(const bool bValue, const FName Reason)
+{
+	if (Reason != NAME_None)
+	{
+		const APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
+		const ULocalPlayer* LocalPlayer = PlayerController ? PlayerController->GetLocalPlayer() : nullptr;
+		if (ensureAlways(LocalPlayer))
+		{
+			SetInputAllowed(bValue, Reason, *LocalPlayer);
+		}
+	}
 }

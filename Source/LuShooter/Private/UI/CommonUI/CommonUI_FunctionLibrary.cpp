@@ -6,6 +6,7 @@
 #include "System/CommonUISubsystem.h"
 #include "UI/CommonUI/CommonUI_DeveloperSettings.h"
 
+
 TSoftClassPtr<UBaseActivatableWidget> UCommonUI_FunctionLibrary::GetWidgetClassByTag(const FGameplayTag Tag)
 {
 	if (!ensureAlways(Tag.IsValid()))

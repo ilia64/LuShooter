@@ -14,6 +14,7 @@ class LUSHOOTER_API UCommonUI_FunctionLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
 
+public:
 	UFUNCTION(BlueprintPure, Category="UI")
 	static TSoftClassPtr<UBaseActivatableWidget> GetWidgetClassByTag(UPARAM(meta=(Categories="UI.Widget")) const FGameplayTag Tag);
 };
