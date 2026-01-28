@@ -10,4 +10,11 @@ UCLASS(Abstract, BlueprintType, meta=(DisableNativeTick))
 class LUSHOOTER_API UBaseActivatableWidget : public UCommonActivatableWidget
 {
 	GENERATED_BODY()
+
+public:
+	virtual TOptional<FUIInputConfig> GetDesiredInputConfig() const override;
+
+private:
+	UPROPERTY(EditDefaultsOnly, Category="Input")
+	FUIInputConfig DefaultInputConfig{ECommonInputMode::Menu, EMouseCaptureMode::NoCapture, false};
 };
