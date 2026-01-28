@@ -1,7 +1,7 @@
 ﻿// Copyright Epic Games, Inc. All Rights Reserve
 
 
-#include "UI/Common/AttributeProgressBar.h"
+#include "UI/Components/AttributeProgressBar.h"
 
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemGlobals.h"

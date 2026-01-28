@@ -1,7 +1,7 @@
 ﻿// Copyright Epic Games, Inc. All Rights Reserve
 
 
-#include "UI/Common/InputActionAbilityWidget.h"
+#include "UI/Components/InputActionAbilityWidget.h"
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemGlobals.h"
 
