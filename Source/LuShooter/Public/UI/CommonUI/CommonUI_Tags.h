@@ -23,4 +23,5 @@ namespace UITag
 
 	//Widgets
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Widget_PressAnyKey);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Widget_GameMenu);
 }

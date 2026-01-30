@@ -15,6 +15,7 @@ public:
 	virtual TOptional<FUIInputConfig> GetDesiredInputConfig() const override;
 
 protected:
+	virtual void NativeConstruct() override;
 	virtual UWidget* NativeGetDesiredFocusTarget() const override;
 
 private:
