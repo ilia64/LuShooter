@@ -12,3 +12,13 @@ TOptional<FUIInputConfig> UBaseActivatableWidget::GetDesiredInputConfig() const
 
 	return TOptional(DefaultInputConfig);
 }
+
+UWidget* UBaseActivatableWidget::NativeGetDesiredFocusTarget() const
+{
+	if (UWidget* Target = Super::NativeGetDesiredFocusTarget())
+	{
+		return Target;
+	}
+
+	return DefaultFocusTarget.Get();
+}

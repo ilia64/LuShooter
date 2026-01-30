@@ -14,7 +14,13 @@ class LUSHOOTER_API UBaseActivatableWidget : public UCommonActivatableWidget
 public:
 	virtual TOptional<FUIInputConfig> GetDesiredInputConfig() const override;
 
+protected:
+	virtual UWidget* NativeGetDesiredFocusTarget() const override;
+
 private:
 	UPROPERTY(EditDefaultsOnly, Category="Input")
 	FUIInputConfig DefaultInputConfig{ECommonInputMode::Menu, EMouseCaptureMode::NoCapture, false};
+
+	UPROPERTY(EditDefaultsOnly, Category="Input")
+	TWeakObjectPtr<UWidget> DefaultFocusTarget{this};
 };
