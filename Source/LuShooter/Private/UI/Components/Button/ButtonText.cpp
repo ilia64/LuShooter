@@ -19,7 +19,10 @@ void UButtonText::NativeOnCurrentTextStyleChanged()
 	if (TextBlock)
 	{
 		const TSubclassOf<UCommonTextStyle> StyleClass = GetCurrentTextStyleClass();
-		TextBlock->SetStyle(StyleClass);
+		if (StyleClass && StyleClass != GetStyle()->GetClass())
+		{
+			TextBlock->SetStyle(StyleClass);
+		}
 	}
 }
 
