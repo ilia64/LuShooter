@@ -20,6 +20,8 @@ public:
 protected:
 	virtual void NativePreConstruct() override;
 	virtual void NativeOnCurrentTextStyleChanged() override;
+	virtual void NativeOnHovered() override;
+	virtual void NativeOnUnhovered() override;
 
 private:
 	UPROPERTY(meta=(BindWidgetOptional))
@@ -32,5 +34,5 @@ private:
 	bool UseUpperCaseForDisplayText{true};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true), Category="Button")
-	FText DescriptionText;
+	FText GlobalHint;
 };

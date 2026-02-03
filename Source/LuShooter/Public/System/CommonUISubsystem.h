@@ -22,6 +22,8 @@ typedef TFunction<void (const EPushActivatableWidgetStatus, UBaseActivatableWidg
 
 DECLARE_LOG_CATEGORY_EXTERN(LogCommonUI, Log, All);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnButtonGlobalHintChanged, const FText, Text);
+
 UCLASS()
 class LUSHOOTER_API UCommonUISubsystem : public UCommonUISubsystemBase
 {
@@ -37,6 +39,10 @@ public:
 	void PushWidgetAsync(const FGameplayTag LayerTag, const TSoftClassPtr<UBaseActivatableWidget> WidgetSoftClass, APlayerController* PlayerController, FOnPushedWidgetCallback OnPushedCallback = FOnPushedWidgetCallback());
 
 	void SuspendInput(const bool bValue, const FName Reason);
+
+public:
+	UPROPERTY(BlueprintAssignable)
+	FOnButtonGlobalHintChanged OnButtonGlobalHintChanged;
 
 private:
 	UPROPERTY(Transient)

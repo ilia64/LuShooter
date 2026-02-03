@@ -4,6 +4,7 @@
 #include "UI/Components/Button/ButtonText.h"
 
 #include "CommonTextBlock.h"
+#include "System/CommonUISubsystem.h"
 
 void UButtonText::NativePreConstruct()
 {
@@ -23,6 +24,26 @@ void UButtonText::NativeOnCurrentTextStyleChanged()
 		{
 			TextBlock->SetStyle(StyleClass);
 		}
+	}
+}
+
+void UButtonText::NativeOnHovered()
+{
+	Super::NativeOnHovered();
+
+	if (!GlobalHint.IsEmpty())
+	{
+		UCommonUISubsystem::Get(this)->OnButtonGlobalHintChanged.Broadcast(GlobalHint);
+	}
+}
+
+void UButtonText::NativeOnUnhovered()
+{
+	Super::NativeOnUnhovered();
+
+	if (!GlobalHint.IsEmpty())
+	{
+		UCommonUISubsystem::Get(this)->OnButtonGlobalHintChanged.Broadcast(FText::GetEmpty());
 	}
 }
 
