@@ -1,19 +1,19 @@
 ﻿// Copyright Epic Games, Inc. All Rights Reserve
 
 
-#include "UI/Components/Button/ButtonText.h"
+#include "UI/Components/Button/TextButton.h"
 
 #include "CommonTextBlock.h"
 #include "System/CommonUISubsystem.h"
 
-void UButtonText::NativePreConstruct()
+void UTextButton::NativePreConstruct()
 {
 	Super::NativePreConstruct();
 
-	SetDisplayText(DisplayText);
+	SetText(DisplayText);
 }
 
-void UButtonText::NativeOnCurrentTextStyleChanged()
+void UTextButton::NativeOnCurrentTextStyleChanged()
 {
 	Super::NativeOnCurrentTextStyleChanged();
 
@@ -27,7 +27,7 @@ void UButtonText::NativeOnCurrentTextStyleChanged()
 	}
 }
 
-void UButtonText::NativeOnHovered()
+void UTextButton::NativeOnHovered()
 {
 	Super::NativeOnHovered();
 
@@ -37,7 +37,7 @@ void UButtonText::NativeOnHovered()
 	}
 }
 
-void UButtonText::NativeOnUnhovered()
+void UTextButton::NativeOnUnhovered()
 {
 	Super::NativeOnUnhovered();
 
@@ -47,11 +47,11 @@ void UButtonText::NativeOnUnhovered()
 	}
 }
 
-void UButtonText::SetDisplayText(const FText InDisplayText)
+void UTextButton::SetText(const FText InText)
 {
-	if (!InDisplayText.IsEmpty() && TextBlock)
+	if (!InText.IsEmpty() && TextBlock)
 	{
-		DisplayText = UseUpperCaseForDisplayText ? InDisplayText.ToUpper() : InDisplayText;
+		DisplayText = UseUpperCaseForDisplayText ? InText.ToUpper() : InText;
 		TextBlock->SetText(DisplayText);
 	}
 }

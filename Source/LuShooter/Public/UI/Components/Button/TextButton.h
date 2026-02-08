@@ -4,18 +4,18 @@
 
 #include "CoreMinimal.h"
 #include "CommonButtonBase.h"
-#include "ButtonText.generated.h"
+#include "TextButton.generated.h"
 
 class UCommonTextBlock;
 
 UCLASS(Abstract, Blueprintable, meta=(DisableNativeTick))
-class LUSHOOTER_API UButtonText : public UCommonButtonBase
+class LUSHOOTER_API UTextButton : public UCommonButtonBase
 {
 	GENERATED_BODY()
 
 public:
 	UFUNCTION(BlueprintCallable)
-	void SetDisplayText(const FText InDisplayText);
+	void SetText(const FText InText);
 
 protected:
 	virtual void NativePreConstruct() override;
