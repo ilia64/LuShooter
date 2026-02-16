@@ -10,5 +10,6 @@ UE_DEFINE_GAMEPLAY_TAG(UITag::Layer_Modal, "UI.Layer.Modal");
 UE_DEFINE_GAMEPLAY_TAG(UITag::Layer_Tooltip, "UI.Layer.Tooltip");
 
 //Widgets
+UE_DEFINE_GAMEPLAY_TAG(UITag::Widget_Confirm, "UI.Widget.Confirm");
 UE_DEFINE_GAMEPLAY_TAG(UITag::Widget_PressAnyKey, "UI.Widget.PressAnyKey");
 UE_DEFINE_GAMEPLAY_TAG(UITag::Widget_GameMenu, "UI.Widget.GameMenu");

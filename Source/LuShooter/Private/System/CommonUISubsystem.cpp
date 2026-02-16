@@ -6,7 +6,10 @@
 #include "GameplayTagContainer.h"
 #include "Engine/AssetManager.h"
 #include "UI/CommonUI/BaseActivatableWidget.h"
+#include "UI/CommonUI/CommonUI_FunctionLibrary.h"
+#include "UI/CommonUI/CommonUI_Tags.h"
 #include "UI/CommonUI/PrimaryGameLayout.h"
+#include "UI/Dialog/ConfirmDialog.h"
 #include "Widgets/CommonActivatableWidgetContainer.h"
 
 DEFINE_LOG_CATEGORY(LogCommonUI);
@@ -125,6 +128,27 @@ void UCommonUISubsystem::PushWidgetAsync(const FGameplayTag LayerTag, const TSof
 			}
 		}
 	}));
+}
+
+void UCommonUISubsystem::PushConfirmDialog(const EConfirmDialogType DialogType, const FText& Title, const FText& Message, TFunction<void(const EConfirmDialogButtonType)> ButtonClickedCallback)
+{
+	FConfirmDialogInfo Info = FConfirmDialogInfo::Create(DialogType, Title, Message);
+	check(Info.IsValid());
+
+	PushWidgetAsync(
+		UITag::Layer_Modal,
+		UCommonUI_FunctionLibrary::GetWidgetClassByTag(UITag::Widget_Confirm),
+		GetWorld()->GetFirstPlayerController(),
+
+		[Info = MoveTemp(Info), Callback = MoveTemp(ButtonClickedCallback)](const EPushActivatableWidgetStatus Status, UBaseActivatableWidget* Widget) mutable
+		{
+			if (Status == Init)
+			{
+				UConfirmDialog* ConfirmDialog = CastChecked<UConfirmDialog>(Widget);
+				ConfirmDialog->InitConfirmDialog(MoveTemp(Info), MoveTemp(Callback));
+			}
+		}
+	);
 }
 
 void UCommonUISubsystem::SuspendInput(const bool bValue, const FName Reason)

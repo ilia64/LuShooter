@@ -22,6 +22,7 @@ namespace UITag
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Layer_Tooltip);
 
 	//Widgets
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Widget_Confirm);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Widget_PressAnyKey);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Widget_GameMenu);
 }
