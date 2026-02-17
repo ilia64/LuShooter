@@ -1,4 +1,4 @@
-﻿// Copyright Epic Games, Inc. All Rights Reserve
+// Copyright Epic Games, Inc. All Rights Reserve
 
 
 #include "UI/Dialog/ConfirmDialog.h"
@@ -47,6 +47,11 @@ FConfirmDialogInfo FConfirmDialogInfo::CreateOkCancelDialog(const FText& Title, 
 	Info.Buttons.Emplace(EConfirmDialogButtonType::Confirmed, FText::FromString(TEXT("Ok")));
 	Info.Buttons.Emplace(EConfirmDialogButtonType::Canceled, FText::FromString(TEXT("Cancel")));
 	return Info;
+}
+
+UConfirmDialog::UConfirmDialog(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
+{
+	bIsModal = true;
 }
 
 void UConfirmDialog::InitConfirmDialog(FConfirmDialogInfo DialogInfo, TFunction<void(EConfirmDialogButtonType)> ClickButtonCallback)

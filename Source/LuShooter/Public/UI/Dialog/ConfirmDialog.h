@@ -1,4 +1,4 @@
-﻿// Copyright Epic Games, Inc. All Rights Reserve
+// Copyright Epic Games, Inc. All Rights Reserve
 
 #pragma once
 
@@ -70,6 +70,8 @@ class LUSHOOTER_API UConfirmDialog : public UBaseActivatableWidget
 	GENERATED_BODY()
 
 public:
+	explicit UConfirmDialog(const FObjectInitializer& ObjectInitializer);
+
 	void InitConfirmDialog(FConfirmDialogInfo DialogInfo, TFunction<void(const EConfirmDialogButtonType)> ClickButtonCallback);
 
 private:
